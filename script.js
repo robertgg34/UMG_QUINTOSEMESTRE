@@ -50,3 +50,58 @@ function mostrarResultados(dias) {
     `;
   });
 }
+
+const API_LOGIN = "https://clima-backend-fwfz.onrender.com"; // reemplaza esto con tu URL real
+
+function iniciarSesion() {
+  const username = document.getElementById("usernameInput").value;
+  const password = document.getElementById("passwordInput").value;
+
+  // Eliminar alertas previas si existen
+  const alertas = document.querySelectorAll("#loginContainer .alert");
+  alertas.forEach(a => a.remove());
+
+  fetch(API_LOGIN, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        mostrarApp();
+      } else {
+        document.getElementById("loginContainer").insertAdjacentHTML("beforeend", `
+          <div class="alert alert-danger mt-3">Usuario o contraseña incorrectos</div>
+        `);
+      }
+    })
+    .catch(() => {
+      document.getElementById("loginContainer").insertAdjacentHTML("beforeend", `
+        <div class="alert alert-danger mt-3">Error en el servidor al intentar iniciar sesión</div>
+      `);
+    });
+}
+
+
+function cerrarSesion() {
+  localStorage.removeItem("token");
+  location.reload();
+}
+
+function mostrarApp() {
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("logoutContainer").style.display = "block";
+  document.getElementById("resultados").style.display = "block";
+}
+
+window.onload = () => {
+  if (localStorage.getItem("token")) {
+    mostrarApp();
+  } else {
+    document.getElementById("loginContainer").style.display = "block";
+    document.getElementById("logoutContainer").style.display = "none";
+    document.getElementById("resultados").style.display = "none";
+  }
+};
