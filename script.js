@@ -30,32 +30,66 @@ if (formLogin) {
   });
 }
 
-// Consulta de clima
+// Consulta de clima: hoy + próximos 5 días
 function obtenerClima() {
   const ciudad = document.getElementById("ciudadInput").value;
   const resultados = document.getElementById("resultados");
   resultados.innerHTML = "<div class='text-muted'>Cargando...</div>";
 
-  fetch(`https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${API_KEY}&units=metric&lang=es`)
+  fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${ciudad}&appid=${API_KEY}&units=metric&lang=es`)
     .then(res => res.json())
     .then(data => {
-      const temp = data.main.temp;
-      const descripcion = data.weather[0].description;
-      const bebida = recomendarBebida(temp);
-
-      resultados.innerHTML = `
-        <div class="col-md-6">
-          <div class="card p-4">
-            <h2 class="card-title">🌡️ ${temp}°C en ${ciudad}</h2>
-            <p class="card-text">Descripción: ${descripcion}</p>
-            <p class="card-text">🥤 Recomendación: <strong>${bebida}</strong></p>
-          </div>
-        </div>
-      `;
+      const diasAgrupados = agruparPronostico(data.list);
+      mostrarClimaConBebida(diasAgrupados, resultados);
     })
     .catch(() => {
       resultados.innerHTML = "<div class='text-danger'>❌ No se pudo obtener el clima.</div>";
     });
+}
+
+function agruparPronostico(lista) {
+  const dias = {};
+  lista.forEach(item => {
+    const fecha = item.dt_txt.split(" ")[0];
+    if (!dias[fecha]) dias[fecha] = [];
+    dias[fecha].push(item);
+  });
+
+  const resumen = [];
+
+  Object.keys(dias).slice(0, 6).forEach(fecha => {
+    const dia = dias[fecha];
+    const temps = dia.map(d => d.main.temp);
+    const promedio = temps.reduce((a, b) => a + b, 0) / temps.length;
+    const descripcion = dia[0].weather[0].description;
+
+    resumen.push({
+      fecha,
+      temp: promedio.toFixed(1),
+      descripcion,
+      bebida: recomendarBebida(promedio)
+    });
+  });
+
+  return resumen;
+}
+
+function mostrarClimaConBebida(dias, contenedor) {
+  contenedor.innerHTML = dias.map(dia => {
+    const fechaFormateada = new Date(dia.fecha).toLocaleDateString("es-ES", {
+      weekday: "long",
+      day: "numeric",
+      month: "short"
+    });
+
+    return `
+      <div class="card p-3 my-2">
+        <h4>${fechaFormateada}</h4>
+        <p>🌡️ ${dia.temp}°C – ${dia.descripcion}</p>
+        <p>🥤 <strong>${dia.bebida}</strong></p>
+      </div>
+    `;
+  }).join("");
 }
 
 function recomendarBebida(temp) {
