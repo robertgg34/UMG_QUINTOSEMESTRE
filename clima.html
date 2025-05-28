@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bebidas según el clima</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient">
+
+  <div class="container py-5 text-center">
+    <div class="emoji-bounce mb-3">
+      <span style="font-size: 4rem;">☀️🥶☕</span>
+    </div>
+
+    <h1 class="fw-bold display-5 mb-1 text-primary">
+      ¡Descubrí tu bebida ideal según el clima! 😎
+    </h1>
+    <p class="text-muted fs-5 mb-4">¿Frío, calor o fresquito? Acá te decimos qué tomar hoy 😉</p>
+
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-8">
+        <div class="input-group shadow-lg">
+          <input type="text" id="ciudadInput" class="form-control form-control-lg" placeholder="Ingresa una ciudad...">
+          <button class="btn btn-primary btn-lg" onclick="obtenerClima()">
+            <i class="bi bi-search-heart-fill"></i> Consultar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultados" class="row justify-content-center"></div>
+
+    <button class="btn btn-outline-danger mt-4" onclick="cerrarSesion()">
+      <i class="bi bi-box-arrow-left"></i> Cerrar sesión
+    </button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
